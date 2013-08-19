@@ -1,0 +1,23 @@
+*.class
+
+# Package Files #
+*.jar
+*.war
+*.ear
+
+# Workspace Metadata #
+.metadata/
+BlackIce/.metadata/
+
+# Eclipse Settings #
+/BlackIce/.settings/
+/BlackIce/.classpath
+/BlackIce/.project
+
+# Tomcat Server #
+/Servers
+/Servers/
+
+# Compiled Sources #
+BlackIce/bin/
+BlackIce/target/
