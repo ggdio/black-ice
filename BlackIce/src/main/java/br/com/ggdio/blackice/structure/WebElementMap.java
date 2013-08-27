@@ -4,7 +4,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import br.com.ggdio.blackice.controller.exception.ControllerConflictException;
+import br.com.ggdio.blackice.scan.exception.WebElementConflict;
 
 /**
  * Class for mapping controllers
@@ -18,11 +18,11 @@ public class WebElementMap<E extends WebElement> {
 	 * Adds a controller to the map, identified by a unique key
 	 * @param key - Key to identify the controller
 	 * @param controller - Controller to be mapped
-	 * @throws ControllerConflictException - If the controller has already been mapped
+	 * @throws WebElementConflict - If the controller has already been mapped
 	 */
-	public void put(String key, E element) throws ControllerConflictException{
+	public void put(String key, E element) throws WebElementConflict{
 		if(this.elements.containsKey(key)){
-			throw new ControllerConflictException("The following element URI has been specified more than once: "+key);
+			throw new WebElementConflict("The following element URI has been specified more than once: "+key);
 		}
 		this.elements.put(key, element);
 	}

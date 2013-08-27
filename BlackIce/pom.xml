@@ -41,6 +41,9 @@
 
 		<!-- VERSÃO DO CORE -->
 		<br.com.sourcesphere.core.version>1.1.0.RELEASE</br.com.sourcesphere.core.version>
+		
+		<!-- VERSÃO DO SPRING -->
+	    <org.springframework.version>3.2.4.RELEASE</org.springframework.version>
 
 	</properties>
 
@@ -142,6 +145,13 @@
 			<artifactId>servlet-api</artifactId>
 			<version>2.5</version>
 		</dependency>
+		
+		<!-- SPRING CORE -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-core</artifactId>
+			<version>${org.springframework.version}</version>
+		</dependency>
 
 		<!-- SOURCESPHERE CORE -->
 		<dependency>
@@ -155,6 +165,20 @@
 			<groupId>log4j</groupId>
 			<artifactId>log4j</artifactId>
 			<version>1.2.16</version>
+		</dependency>
+		
+		<!-- REFLECTIONS -->
+		<dependency>
+	        <groupId>org.reflections</groupId>
+	        <artifactId>reflections</artifactId>
+	        <version>0.9.9-RC1</version>
+	    </dependency>
+		
+		<!-- XSTREAM -->
+		<dependency>
+			<groupId>xstream</groupId>
+			<artifactId>xstream</artifactId>
+			<version>1.2.2</version>
 		</dependency>
 
 		<!-- JUNIT -->

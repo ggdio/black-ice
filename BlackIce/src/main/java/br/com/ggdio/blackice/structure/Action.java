@@ -17,4 +17,9 @@ public final class Action extends WebElement{
 		super(method);
 	}
 	
+	public Method getPiece() {
+		// TODO Auto-generated method stub
+		return (Method)super.getPiece();
+	}
+	
 }
