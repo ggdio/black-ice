@@ -12,6 +12,9 @@ public class BlackiceParameters {
 	@XStreamAlias("basePackage")
 	private String basePackage;
 	
+	@XStreamAlias("annotationBased")
+	private boolean annotationBased;
+	
 	public BlackiceParameters() {
 		
 	}
@@ -27,5 +30,13 @@ public class BlackiceParameters {
 
 	public void setBasePackage(String basePackage) {
 		this.basePackage = basePackage;
+	}
+	
+	public boolean isAnnotationBased() {
+		return annotationBased;
+	}
+	
+	public void setAnnotationBased(boolean annotationBased) {
+		this.annotationBased = annotationBased;
 	}
 }

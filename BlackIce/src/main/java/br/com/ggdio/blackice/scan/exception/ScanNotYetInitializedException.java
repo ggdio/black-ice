@@ -5,14 +5,14 @@ package br.com.ggdio.blackice.scan.exception;
  * @author Guilherme Dio
  *
  */
-public class ProjectNotScannedException extends RuntimeException {
+public class ScanNotYetInitializedException extends RuntimeException {
 	
 	/**
 	 * SerialUID
 	 */
 	private static final long serialVersionUID = 1288667197613258777L;
 
-	public ProjectNotScannedException(String msg){
+	public ScanNotYetInitializedException(String msg){
 		super(msg);
 	}
 

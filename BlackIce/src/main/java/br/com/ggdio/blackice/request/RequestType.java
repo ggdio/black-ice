@@ -1,4 +1,4 @@
-package br.com.ggdio.blackice.enumeration;
+package br.com.ggdio.blackice.request;
 
 public enum RequestType {
 	POST,

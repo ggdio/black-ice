@@ -1,11 +1,13 @@
 package br.com.ggdio.blackice.scan.exception;
 
+import br.com.ggdio.blackice.structure.exception.WebElementConflictException;
+
 /**
  * Exception for identifying when an Action has been already mapped by BlackIce
  * @author Guilherme Dio
  *
  */
-public class ActionConflict extends WebElementConflict {
+public class ActionConflict extends WebElementConflictException {
 
 
 	/**

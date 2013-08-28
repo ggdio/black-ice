@@ -2,4 +2,5 @@
 
 <framework-config>
 	<basePackage>null</basePackage>
+	<annotationBased>true</annotationBased>
 </framework-config>
