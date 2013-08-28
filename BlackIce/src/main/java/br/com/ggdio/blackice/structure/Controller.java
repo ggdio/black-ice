@@ -1,75 +1,65 @@
 package br.com.ggdio.blackice.structure;
 
-import java.util.Collection;
+import java.lang.reflect.Modifier;
 
-import br.com.ggdio.blackice.scan.exception.ActionConflict;
-import br.com.ggdio.blackice.scan.exception.WebElementConflict;
-
+import br.com.ggdio.blackice.structure.exception.ElementIsNotControllerException;
 
 /**
  * Definition of a Controller, which execute actions
  * @author Guilherme Dio
- * TODO: Criar interface de mapa para definir um tipos especifico para o {@link Controller} e o {@link WebElementMap}
  */
-public final class Controller extends WebElement {
+public final class Controller extends WebElementMap<Action> implements WebElement<Class<?>> {
 	
 	/**
-	 * The {@link Action} 's of the {@link Controller}
+	 * The element definition must be a class(Controller)
 	 */
-	private WebElementMap<Action> actions = new WebElementMap<Action>();
+	private final Class<?> elementDefinition;
 	
 	/**
 	 * Specific Constructor
-	 * @param method - The method wich represents the {@link Action}
+	 * @param clazz - Class that represents a Controller
+	 * @throws ElementIsNotControllerException if the clazz is not annotated with @Controller
 	 */
 	public Controller(Class<?> clazz) {
-		super(clazz);
+		checkAnnotation(clazz);
+		this.elementDefinition = clazz;
 	}
 	
+	/**
+	 * Assure that the class is annotated with @Controller
+	 * @param clazz - The class to be checked
+	 */
+	protected void checkAnnotation(Class<?> clazz){
+		if(!Modifier.isPublic(clazz.getModifiers()))
+			if(this.getAnnotation(clazz) == null)
+				throw new ElementIsNotControllerException("The class "+clazz.getName()+" is not a Controller or is not annotated with @Controller");
+	}
+	
+	/**
+	 * Returns a specific name for this element
+	 */
 	@Override
-	public Class<?> getPiece() {
-		// TODO Auto-generated method stub
-		return (Class<?>)super.getPiece();
-	}
-
-	/**
-	 * Get the actions of this {@link Controller}
-	 * @return {@link WebElementMap}
-	 */
-	protected WebElementMap<Action> getActions() {
-		return actions;
+	public String getElementName() {
+		String name = this.getAnnotation(this.getElementDefinition()).value();
+		if(name == null)
+			name = getElementDefinition().getSimpleName();
+		if(!name.startsWith("/"))
+			name = "/" + name;
+		if(name.endsWith("/"))
+			name = name.substring(0, name.lastIndexOf("/"));
+		return name;
 	}
 	
 	/**
-	 * Adds a action to the map, identified by a unique key
-	 * @param key - Key to identify the action
-	 * @param controller - Action to be mapped
-	 * @throws ActionConflict - If the action has already been mapped
+	 * Returns the class wich represents the Controller
 	 */
-	public void putAction(String key,Action action) throws ActionConflict{
-		try {
-			getActions().put(key, action);
-		} 
-		catch (WebElementConflict e) {
-			throw new ActionConflict(e);
-		}
+	@Override
+	public Class<?> getElementDefinition() {
+		return this.elementDefinition;
 	}
 	
-	/**
-	 * Returns a mapped controller
-	 * @param key - Key to the controller
-	 * @return
-	 */
-	public Action get(String key){
-		return getActions().get(key);
-	}
-	
-	/**
-	 * Returns all the mapped controllers
-	 * @return
-	 */
-	public Collection<Action> values(){
-		return getActions().values();
+	private br.com.ggdio.blackice.annotation.Controller getAnnotation(Class<?> clazz) {
+		return clazz.getAnnotation(br.com.ggdio.blackice.annotation.Controller.class);
 	}
 	
 }
