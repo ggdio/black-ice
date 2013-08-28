@@ -1,6 +1,6 @@
 package br.com.ggdio.blackice.annotation;
 
-import br.com.ggdio.blackice.enumeration.RequestType;
+import br.com.ggdio.blackice.request.RequestType;
 
 /**
  * Tells BlackIce that a {@link Class} is an {@link Controller}
