@@ -1,6 +1,8 @@
 package br.com.ggdio.blackice.annotation;
 
 import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.reflect.Method;
 
@@ -10,6 +12,7 @@ import br.com.ggdio.blackice.request.RequestType;
  * Tells BlackIce that a {@link Method} is an {@link Action} of a {@link Controller}
  * @author Guilherme Dio	
  */
+@Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface Action {
 	/**

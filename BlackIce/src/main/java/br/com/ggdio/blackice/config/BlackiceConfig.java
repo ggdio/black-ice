@@ -1,9 +1,14 @@
 package br.com.ggdio.blackice.config;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
 
+import br.com.ggdio.blackice.config.exception.ConfigurationException;
+import br.com.ggdio.blackice.config.exception.ConfigurationFileNotFoundException;
 import br.com.ggdio.blackice.structure.Controller;
 import br.com.ggdio.blackice.structure.WebElementMap;
 
@@ -24,21 +29,56 @@ public class BlackiceConfig {
 	 */
 	private BlackiceParameters parameters = new BlackiceParameters();
 	private WebElementMap<Controller> controllers = new WebElementMap<Controller>();
-	private final Map<FileType, URL> configFiles = new HashMap<FileType, URL>();
-	
-	public enum FileType{
-		PROPERTIES,
-		XML,
-		//JSON - not yet implemented,
-		//CSV - not yet implemented
-	}
 	
 	private BlackiceConfig() {
-		configFiles.put(FileType.PROPERTIES, BlackiceConfig.class.getResource("/blackice.properties"));
-		configFiles.put(FileType.XML, BlackiceConfig.class.getResource("/blackice.xml"));
-		//Not yet implemented types:
-		//configFiles.put("json", BlackiceConfig.class.getResource("/blackice.json"));
-		//configFiles.put("csv", BlackiceConfig.class.getResource("/blackice.csv"));
+	}
+	
+	public void loadParameters() throws FileNotFoundException{
+		ClassLoader clsLoader = this.getClass().getClassLoader();
+		try{
+			File[] dirFiles = listBlackiceFilesK(clsLoader.getResource("WEB-INF"));
+			if(dirFiles == null || dirFiles.length == 0)
+				dirFiles = listBlackiceFilesK(clsLoader.getResource(""));
+			if(dirFiles == null || dirFiles.length == 0)
+				throw new ConfigurationFileNotFoundException("The configuration file has not been defined on the classpath");
+			for(File file : dirFiles){
+				if(file.isFile()){
+					FileType type = getFileType(file);
+					if(type != null){
+						this.parameters = type.getResolver().resolveParameters(file);
+						break;
+					}
+				}
+			}
+		}
+		catch(URISyntaxException e){
+			throw new ConfigurationException("Error while searching the classpath for the blackice configuration file", e);
+		}
+		catch(IOException e){
+			throw new ConfigurationException("Error while reading the blackice configuration file", e);
+		}
+	}
+	
+	private File[] listBlackiceFilesK(URL location) throws URISyntaxException{
+		if(location == null) 
+			return null;
+		File dir = new File(location.toURI());
+		return dir.listFiles(new FilenameFilter() {
+			@Override
+			public boolean accept(File dir, String name) {
+				return name.toLowerCase().startsWith("blackice.");
+			}
+		});
+	}
+	
+	private FileType getFileType(File file){
+		String fileName = file.getName();
+		String extension = fileName.substring(fileName.indexOf(".")+1).toLowerCase();
+		if(extension.equals("properties"))
+			return FileType.PROPERTIES;
+		else if(extension.equals("xml"))
+			return FileType.XML;
+		return null;
 	}
 	
 	/**
@@ -59,27 +99,9 @@ public class BlackiceConfig {
 	}
 	
 	/**
-	 * Sets the parameters on BlackiceConfig
-	 * @param basePackage - The base package to be scanned
-	 * @param annotationBased - Is the framework annotation based ?
-	 */
-	public void setParameters(String basePackage, boolean annotationBased){
-		this.getParameters().setBasePackage(basePackage);
-		this.getParameters().setAnnotationBased(annotationBased);
-	}
-	
-	/**
 	 * Gets all the controllers mapped by BlackIce
 	 */
 	public WebElementMap<Controller> getControllers(){
 		return this.controllers;
-	}
-	
-	/**
-	 * Gets a configuration file from classpath
-	 * @param type - the type of file to get
-	 */
-	public URL getConfigurationFile(FileType type){
-		return this.configFiles.get(type);
 	}
 }

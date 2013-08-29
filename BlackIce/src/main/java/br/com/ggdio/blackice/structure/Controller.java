@@ -62,4 +62,17 @@ public final class Controller extends WebElementMap<Action> implements WebElemen
 		return clazz.getAnnotation(br.com.ggdio.blackice.annotation.Controller.class);
 	}
 	
+	/**
+	 * Gets an action full path
+	 * @param key - The key to the action
+	 * @return The full path of the specified action
+	 */
+	public String getActionPath(String key) {
+		String path = this.getElementName();
+		Action action = super.get(key);
+		if(action != null)
+			return path+action.getElementName();
+		return path + "/";
+	}
+	
 }

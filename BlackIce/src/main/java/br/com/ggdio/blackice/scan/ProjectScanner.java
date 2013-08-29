@@ -4,27 +4,20 @@ import static org.reflections.ReflectionUtils.withAnnotation;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 import java.util.Set;
 
 import org.reflections.ReflectionUtils;
 import org.reflections.Reflections;
 
 import br.com.ggdio.blackice.config.BlackiceConfig;
-import br.com.ggdio.blackice.config.BlackiceConfig.FileType;
-import br.com.ggdio.blackice.config.BlackiceParameters;
-import br.com.ggdio.blackice.scan.exception.ConfigurationFileNotFoundException;
 import br.com.ggdio.blackice.scan.exception.ScanNotYetInitializedException;
 import br.com.ggdio.blackice.scan.exception.ScannerException;
 import br.com.ggdio.blackice.structure.Action;
 import br.com.ggdio.blackice.structure.Controller;
 import br.com.ggdio.blackice.structure.WebElementMap;
 import br.com.ggdio.blackice.structure.exception.WebElementConflictException;
-
-import com.thoughtworks.xstream.XStream;
 
 /**
  * 
@@ -75,34 +68,12 @@ public final class ProjectScanner {
 	 * @throws ScannerException
 	 */
 	public void init() throws ScannerException{
-		URL configFile = null;
 		try{
-			//The properties file is the default
-			configFile = this.config.getConfigurationFile(FileType.PROPERTIES);
-			if(configFile != null){
-				Properties props = new Properties();
-				props.load(configFile.openStream());
-				this.config.setParameters(props.getProperty("basePackage"),Boolean.parseBoolean(props.getProperty("annotationBased")));
-				this.initiated = true;
-				return;
-			}
-			
-			//The XML is optional, if the properties does not exist it will be used. Otherwise, it wont be read.
-			configFile = this.config.getConfigurationFile(FileType.XML);
-			if(configFile != null){
-				BlackiceParameters params = (BlackiceParameters) new XStream().fromXML(configFile.openStream());
-				this.config.setParameters(params.getBasePackage(),params.isAnnotationBased());
-				this.initiated = true;
-				return;
-			}
-			//File not found, exception must be thrown to warn the developer
-			throw new ConfigurationFileNotFoundException("The configuration file has not been defined on the classpath");
+			this.config.loadParameters();
+			this.initiated = true;
 		}
 		catch(Exception e){
 			throw new ScannerException("An error occured while initiating the project.",e);
-		}
-		finally{
-			configFile = null;
 		}
 	}
 	
@@ -155,6 +126,9 @@ public final class ProjectScanner {
 	 */
 	private List<Class<?>> listAllControllerClasses()
 	{
+		/**
+		 * TODO: Fix the scan, because its not returing the classes under basePackage
+		 */
 		Reflections reflections = new Reflections(this.config.getParameters().getBasePackage());
 		Set<Class<?>> classes = reflections.getSubTypesOf(Object.class);
 		return new ArrayList<Class<?>>(classes);

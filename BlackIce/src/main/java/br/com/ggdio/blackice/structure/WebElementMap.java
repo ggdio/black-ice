@@ -43,6 +43,8 @@ public class WebElementMap<E extends WebElement<?>> {
 	 * @return The value of the specific key
 	 */
 	public E get(String key){
+		if(!key.startsWith("/"))
+			key = "/" + key;
 		return this.elements.get(key);
 	}
 	

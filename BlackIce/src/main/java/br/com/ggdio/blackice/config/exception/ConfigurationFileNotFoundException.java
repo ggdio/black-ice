@@ -1,4 +1,4 @@
-package br.com.ggdio.blackice.scan.exception;
+package br.com.ggdio.blackice.config.exception;
 
 import java.io.FileNotFoundException;
 
