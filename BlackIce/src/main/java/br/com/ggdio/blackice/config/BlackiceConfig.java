@@ -2,7 +2,6 @@ package br.com.ggdio.blackice.config;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -18,7 +17,7 @@ import br.com.ggdio.blackice.structure.WebElementMap;
  * @author Guilherme Dio
  * @since 27/08/2013
  */
-public class BlackiceConfig {
+public final class BlackiceConfig {
 	/**
 	 * Singleton instance
 	 */
@@ -29,25 +28,29 @@ public class BlackiceConfig {
 	 */
 	private BlackiceParameters parameters = new BlackiceParameters();
 	private WebElementMap<Controller> controllers = new WebElementMap<Controller>();
+	private final String[] configDirs = {"", "WEB-INF"};
 	
 	private BlackiceConfig() {
 	}
 	
+	/**
+	 * Gets an unique instance of the configuration
+	 * @return
+	 */
+	public static BlackiceConfig getInstance(){
+		if(instance == null)
+			instance = new BlackiceConfig();
+		return instance;
+	}
+	
 	public void loadParameters() throws FileNotFoundException{
-		ClassLoader clsLoader = this.getClass().getClassLoader();
+		final ClassLoader clsLoader = this.getClass().getClassLoader();
 		try{
-			File[] dirFiles = listBlackiceFilesK(clsLoader.getResource("WEB-INF"));
-			if(dirFiles == null || dirFiles.length == 0)
-				dirFiles = listBlackiceFilesK(clsLoader.getResource(""));
-			if(dirFiles == null || dirFiles.length == 0)
-				throw new ConfigurationFileNotFoundException("The configuration file has not been defined on the classpath");
-			for(File file : dirFiles){
-				if(file.isFile()){
-					FileType type = getFileType(file);
-					if(type != null){
-						this.parameters = type.getResolver().resolveParameters(file);
-						break;
-					}
+			for(File file : getConfigDirectory(clsLoader)){
+				FileType type = FileType.valueOf(file);
+				if(type != null){
+					this.parameters = type.getResolver().resolveParameters(file);
+					break;
 				}
 			}
 		}
@@ -59,36 +62,19 @@ public class BlackiceConfig {
 		}
 	}
 	
-	private File[] listBlackiceFilesK(URL location) throws URISyntaxException{
+	private File[] getConfigDirectory(ClassLoader clsLoader) throws ConfigurationFileNotFoundException, URISyntaxException{
+		for(String dir : configDirs){
+			File[] dirFiles = listBlackiceFiles(clsLoader.getResource(dir));
+			if(dirFiles.length > 0)
+				return dirFiles;
+		}
+		throw new ConfigurationFileNotFoundException("The configuration file has not been defined on the classpath");
+	}
+	
+	private File[] listBlackiceFiles(URL location) throws URISyntaxException{
 		if(location == null) 
 			return null;
-		File dir = new File(location.toURI());
-		return dir.listFiles(new FilenameFilter() {
-			@Override
-			public boolean accept(File dir, String name) {
-				return name.toLowerCase().startsWith("blackice.");
-			}
-		});
-	}
-	
-	private FileType getFileType(File file){
-		String fileName = file.getName();
-		String extension = fileName.substring(fileName.indexOf(".")+1).toLowerCase();
-		if(extension.equals("properties"))
-			return FileType.PROPERTIES;
-		else if(extension.equals("xml"))
-			return FileType.XML;
-		return null;
-	}
-	
-	/**
-	 * Gets an unique instance of the configuration
-	 * @return
-	 */
-	public static BlackiceConfig getInstance(){
-		if(instance == null)
-			instance = new BlackiceConfig();
-		return instance;
+		return new File(location.toURI()).listFiles(new BlackiceConfigFileFilter());
 	}
 	
 	/**
